@@ -1,4 +1,17 @@
 ____________________________________________________________________________
+[  2623] By: autrijus                              on 2001/12/16  00:05:58
+        Log: * so, this is 0.02.
+             * uses rgb codes even for white and black for uniformity.
+             * fixes up documentation nits.
+             * joins the input array instead of interpolating it.
+             * better spacing in the source code.
+             * modified tests to reflect the changes.
+	   ! FromANSI.pm README t/1-basic.t
+____________________________________________________________________________
+[  2453] By: autrijus                              on 2001/11/28  04:04:00
+        Log: * changes.
+	   + Changes
+____________________________________________________________________________
 [  2452] By: autrijus                              on 2001/11/28  04:02:46
         Log: * This be HTML::FromANSI 0.01, first CPAN version.
 	   ! FromANSI.pm bin/ansi2html t/1-basic.t
