@@ -1,0 +1,17 @@
+____________________________________________________________________________
+[  2452] By: autrijus                              on 2001/11/28  04:02:46
+        Log: * This be HTML::FromANSI 0.01, first CPAN version.
+	   ! FromANSI.pm bin/ansi2html t/1-basic.t
+____________________________________________________________________________
+[  2451] By: autrijus                              on 2001/11/28  03:52:52
+        Log: * removes redundant spaces and variables.
+	   ! FromANSI.pm
+____________________________________________________________________________
+[  2448] By: autrijus                              on 2001/11/28  03:30:30
+        Log: * oops, freudian slip: ANSIScreen is really ANSIColor.
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  2445] By: autrijus                              on 2001/11/28  02:31:40
+        Log: * HTML::FromANSI, vanilla import.
+	   + FromANSI.pm MANIFEST Makefile.PL README bin/ansi2html
+	   + t/1-basic.t

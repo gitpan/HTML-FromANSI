@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+# $File: //member/autrijus/HTML-FromANSI/bin/ansi2html $ $Author: autrijus $
+# $Revision: #2 $ $Change: 2452 $ $DateTime: 2001/11/28 04:02:46 $
+
+$VERSION = '0.01';
+
+=head1 NAME
+
+ansi2html - Convert ANSI sequence to HTML
+
+=head1 SYNOPSIS
+
+B<ansi2html> S<[ I<infile> ]> S<[ I<outfile> ]>
+
+=head1 DESCRIPTION
+
+This script takes one input file containing text with ANSI sequences,
+and outputs the converted HTML code into another file.
+
+If I<outfile> is omitted, it defaults to STDOUT.  If I<infile> is omitted,
+it defaults to STDIN.
+
+=cut
+
+use HTML::FromANSI;
+
+my ($infile, $outfile) = @ARGV;
+
+open IN,  $infile     or die "cannot read $infile: $!"   if $infile;
+open OUT, ">$outfile" or die "cannot write $outfile: $!" if $outfile;
+
+my $infile = shift(@ARGV);
+
+if ($outfile) {
+    print OUT ansi2html($infile ? <__> : <STDIN>);
+}
+else {
+    print ansi2html($infile ? <__> : <STDIN>);
+}
+
+exit;
+
+=head1 SEE ALSO
+
+L<HTML::FromANSI>, L<Term::ANSIColor>.
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut
