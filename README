@@ -1,5 +1,5 @@
 # $File: //member/autrijus/HTML-FromANSI/README $ $Author: autrijus $
-# $Revision: #2 $ $Change: 2623 $ $DateTime: 2001/12/16 00:05:58 $
+# $Revision: #3 $ $Change: 3581 $ $DateTime: 2002/03/28 11:52:18 $
 
 This is the README file for HTML::FromANSI, a small module that
 converts ANSI text sequences to corresponding HTML codes, using
@@ -16,12 +16,7 @@ make install
 
 * Copyright
 
-Copyright 2001 by Stephen Hurd <shurd@sk.sympatico.ca>.
-
-Picked up, cleaned up various bits, fixed bugs and turned into a
-CPAN module by Autrijus Tang.
-
-Copyright 2001 by Autrijus Tang <autrijus@autrijus.org>.
+Copyright 2001-2002 by Autrijus Tang <autrijus@autrijus.org>.
 
 All rights reserved.  You can redistribute and/or modify
 this bundle under the same terms as Perl itself.

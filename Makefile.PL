@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # $File: //member/autrijus/HTML-FromANSI/Makefile.PL $ $Author: autrijus $
-# $Revision: #1 $ $Change: 2445 $ $DateTime: 2001/11/28 02:31:40 $
+# $Revision: #2 $ $Change: 3581 $ $DateTime: 2002/03/28 11:52:18 $
 
 require 5.005;
 
@@ -16,6 +16,8 @@ WriteMakefile(
 
     PREREQ_PM		=> {
 	'Test::More'	=> '0.11',
+	'Term::VT102'	=> '0.01',
+	'HTML::Entities'=> '0.01',
     },
 
     EXE_FILES		=> [ <bin/*> ],

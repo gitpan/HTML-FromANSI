@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 # $File: //member/autrijus/HTML-FromANSI/bin/ansi2html $ $Author: autrijus $
-# $Revision: #2 $ $Change: 2452 $ $DateTime: 2001/11/28 04:02:46 $
+# $Revision: #4 $ $Change: 3624 $ $DateTime: 2002/04/01 20:58:57 $
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ ansi2html - Convert ANSI sequence to HTML
 
 =head1 SYNOPSIS
 
-B<ansi2html> S<[ I<infile> ]> S<[ I<outfile> ]>
+B<ansi2html> S<[ B<-p> ]> S<[ I<infile> ]> S<[ I<outfile> ]>
 
 =head1 DESCRIPTION
 
@@ -20,29 +20,42 @@ and outputs the converted HTML code into another file.
 If I<outfile> is omitted, it defaults to STDOUT.  If I<infile> is omitted,
 it defaults to STDIN.
 
+Note that this script will automatically set the C<fill_cols> option
+to 1, filling empty columns with space characters.
+
+If the B<-p> option is specified, it will print HTML header and footers.
+
 =cut
 
-use HTML::FromANSI;
+use strict;
+use Getopt::Std;
+use HTML::FromANSI qw|%Options ansi2html|;
+
+my %args; getopts('p', \%args);
+$Options{fill_cols} = 1;
 
 my ($infile, $outfile) = @ARGV;
 
 open IN,  $infile     or die "cannot read $infile: $!"   if $infile;
 open OUT, ">$outfile" or die "cannot write $outfile: $!" if $outfile;
+select OUT if $outfile;
 
-my $infile = shift(@ARGV);
+if ($args{p}) {
+    my $title = 'ansi2html' . ($infile ? " - $infile" : '');
 
-if ($outfile) {
-    print OUT ansi2html($infile ? <__> : <STDIN>);
+    print "<HTML><HEAD><TITLE>$title</TITLE></HEAD><BODY>".
+	  ansi2html($infile ? <IN> : <STDIN>).
+	  "</BODY></HTML>";
 }
 else {
-    print ansi2html($infile ? <__> : <STDIN>);
+    print ansi2html($infile ? <IN> : <STDIN>);
 }
 
 exit;
 
 =head1 SEE ALSO
 
-L<HTML::FromANSI>, L<Term::ANSIColor>.
+L<HTML::FromANSI>
 
 =head1 AUTHORS
 
@@ -50,7 +63,7 @@ Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2001 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+Copyright 2001, 2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
 
 This program is free software; you can redistribute it and/or 
 modify it under the same terms as Perl itself.

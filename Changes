@@ -1,4 +1,34 @@
 ____________________________________________________________________________
+[  3625] By: autrijus                              on 2002/04/01  21:00:12
+        Log: * this be HTML::FromANSI 1.00.
+             * adds the 'tt' option to control <tt>'s printing.
+             * <font> is now omitted if 'style' and 'font_face' are both
+	     empty.
+             * count_lines() is now much more intelligent.
+             * POD documents.
+	   ! FromANSI.pm
+____________________________________________________________________________
+[  3624] By: autrijus                              on 2002/04/01  20:58:57
+        Log: * adds -p option to print html header/footers.
+	   ! bin/ansi2html
+____________________________________________________________________________
+[  3623] By: autrijus                              on 2002/04/01  19:57:32
+        Log: * ditched the unneccessary Term::ANSIColor dependency.
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  3622] By: autrijus                              on 2002/04/01  19:56:46
+        Log: * reading from file wasn't even working.
+             * use select() instead of the awkward conditional.
+	   ! bin/ansi2html
+____________________________________________________________________________
+[  3581] By: autrijus                              on 2002/03/28  11:52:18
+        Log: * totally re-written from scratch, now based on Term::VT102.
+	   ! FromANSI.pm Makefile.PL README t/1-basic.t
+____________________________________________________________________________
+[  2624] By: autrijus                              on 2001/12/16  00:06:46
+        Log: * changes.
+	   ! Changes
+____________________________________________________________________________
 [  2623] By: autrijus                              on 2001/12/16  00:05:58
         Log: * so, this is 0.02.
              * uses rgb codes even for white and black for uniformity.
