@@ -1,60 +1,21 @@
 ____________________________________________________________________________
-[  3625] By: autrijus                              on 2002/04/01  21:00:12
-        Log: * this be HTML::FromANSI 1.00.
-             * adds the 'tt' option to control <tt>'s printing.
-             * <font> is now omitted if 'style' and 'font_face' are both
-	     empty.
-             * count_lines() is now much more intelligent.
-             * POD documents.
-	   ! FromANSI.pm
+[  7867] By: autrijus                              on 2003/09/04  17:11:36
+        Log: * This be the real 1.01.
+             * Updates copyright and readme.
+	   ! README lib/HTML/FromANSI.pm
 ____________________________________________________________________________
-[  3624] By: autrijus                              on 2002/04/01  20:58:57
-        Log: * adds -p option to print html header/footers.
-	   ! bin/ansi2html
+[  7866] By: autrijus                              on 2003/09/04  17:10:17
+        Log: * This be 1.01.
+             * Setting options in the "use" line was not working. fixed.
+             * Implemented a new boolean option, "show_cursor", that
+	       controls
+             whether to highlight the character under the cursor
+	     position.
+             (Suggested by Fabien ALLAINE)
+	   ! lib/HTML/FromANSI.pm t/1-basic.t
 ____________________________________________________________________________
-[  3623] By: autrijus                              on 2002/04/01  19:57:32
-        Log: * ditched the unneccessary Term::ANSIColor dependency.
-	   ! t/1-basic.t
-____________________________________________________________________________
-[  3622] By: autrijus                              on 2002/04/01  19:56:46
-        Log: * reading from file wasn't even working.
-             * use select() instead of the awkward conditional.
-	   ! bin/ansi2html
-____________________________________________________________________________
-[  3581] By: autrijus                              on 2002/03/28  11:52:18
-        Log: * totally re-written from scratch, now based on Term::VT102.
-	   ! FromANSI.pm Makefile.PL README t/1-basic.t
-____________________________________________________________________________
-[  2624] By: autrijus                              on 2001/12/16  00:06:46
-        Log: * changes.
-	   ! Changes
-____________________________________________________________________________
-[  2623] By: autrijus                              on 2001/12/16  00:05:58
-        Log: * so, this is 0.02.
-             * uses rgb codes even for white and black for uniformity.
-             * fixes up documentation nits.
-             * joins the input array instead of interpolating it.
-             * better spacing in the source code.
-             * modified tests to reflect the changes.
-	   ! FromANSI.pm README t/1-basic.t
-____________________________________________________________________________
-[  2453] By: autrijus                              on 2001/11/28  04:04:00
-        Log: * changes.
-	   + Changes
-____________________________________________________________________________
-[  2452] By: autrijus                              on 2001/11/28  04:02:46
-        Log: * This be HTML::FromANSI 0.01, first CPAN version.
-	   ! FromANSI.pm bin/ansi2html t/1-basic.t
-____________________________________________________________________________
-[  2451] By: autrijus                              on 2001/11/28  03:52:52
-        Log: * removes redundant spaces and variables.
-	   ! FromANSI.pm
-____________________________________________________________________________
-[  2448] By: autrijus                              on 2001/11/28  03:30:30
-        Log: * oops, freudian slip: ANSIScreen is really ANSIColor.
-	   ! t/1-basic.t
-____________________________________________________________________________
-[  2445] By: autrijus                              on 2001/11/28  02:31:40
-        Log: * HTML::FromANSI, vanilla import.
-	   + FromANSI.pm MANIFEST Makefile.PL README bin/ansi2html
-	   + t/1-basic.t
+[  7865] By: autrijus                              on 2003/09/04  15:24:44
+        Log: * move things around a bit to meet modern standards.
+	  +> lib/HTML/FromANSI.pm script/ansi2html
+	   - FromANSI.pm bin/ansi2html
+	   ! MANIFEST

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # $File: //member/autrijus/HTML-FromANSI/Makefile.PL $ $Author: autrijus $
-# $Revision: #2 $ $Change: 3581 $ $DateTime: 2002/03/28 11:52:18 $
+# $Revision: #2 $ $Change: 7869 $ $DateTime: 2003/09/04 17:27:47 $
 
 require 5.005;
 
@@ -10,7 +10,7 @@ WriteMakefile(
     AUTHOR		=> 'Autrijus Tang (autrijus@autrijus.org)',
     ABSTRACT		=> 'Mark up ANSI sequences as HTML',
     NAME		=> 'HTML::FromANSI',
-    VERSION_FROM	=> 'FromANSI.pm', 
+    VERSION_FROM	=> 'lib/HTML/FromANSI.pm', 
     DISTNAME		=> 'HTML-FromANSI',
     BINARY_LOCATION	=> 'x86/HTML-FromANSI.tar.gz',
 
@@ -20,10 +20,10 @@ WriteMakefile(
 	'HTML::Entities'=> '0.01',
     },
 
-    EXE_FILES		=> [ <bin/*> ],
+    EXE_FILES		=> [ 'script/ansi2html' ],
 
     dist		=> {
-        COMPRESS	=> 'gzip',
+        COMPRESS	=> 'gzip -9',
         SUFFIX		=> '.gz',
     },
 );

@@ -1,8 +1,8 @@
-# $File: //member/autrijus/HTML-FromANSI/FromANSI.pm $ $Author: autrijus $
-# $Revision: #8 $ $Change: 3626 $ $DateTime: 2002/04/01 21:01:37 $
+# $File: //member/autrijus/HTML-FromANSI/lib/HTML/FromANSI.pm $ $Author: autrijus $
+# $Revision: #3 $ $Change: 7867 $ $DateTime: 2003/09/04 17:11:36 $
 
 package HTML::FromANSI;
-$HTML::FromANSI::VERSION = '1.00';
+$HTML::FromANSI::VERSION = '1.01';
 
 use strict;
 use base qw/Exporter/;
@@ -13,6 +13,11 @@ use HTML::Entities;
 =head1 NAME
 
 HTML::FromANSI - Mark up ANSI sequences as HTML
+
+=head1 VERSION
+
+This document describes version 1.01 of HTML::FromANSI, released
+September 5, 2003.
 
 =head1 SYNOPSIS
 
@@ -40,7 +45,7 @@ look at my B<Term::ANSIScreen> module.
 =head1 OPTIONS
 
 There are various options stored in the C<%HTML::FromANSI::Options>
-hash; you can also import it explicitly from the C<use> line. Below
+hash; you can also enter them explicitly from the C<use> line. Below
 are brief description of each option:
 
 =over 4
@@ -103,6 +108,12 @@ C<font> tag will be omitted.
 A boolean value specifying whether the HTML text should be enclosed in a
 C<tt> tag or not. Defaults to C<1>.
 
+=item show_cursor
+
+A boolean value to control whether to highlight the character under
+the cursor position, by reversing its background and foregroud color.
+Defaults to C<0>.
+
 =cut
 
 @EXPORT = '&ansi2html';
@@ -125,7 +136,16 @@ C<tt> tag or not. Defaults to C<1>.
     font_face	=> 'fixedsys, lucida console, terminal, vga, monospace',
     style	=> 'line-height: 1; letter-spacing: 0; font-size: 12pt',
     tt		=> 1,
+    show_cursor	=> 0,
 );
+
+sub import {
+    my $class = shift;
+    while (my ($k, $v) = splice(@_, 0, 2)) {
+	$Options{$k} = $v;
+    }
+    $class->export_to_level(1);
+}
 
 sub ansi2html {
     my $vt = Term::VT102->new(
@@ -165,19 +185,29 @@ sub parse_vt {
     my (%prev, %this); # attributes
     my $out;
 
+    my ($x, $y) = ($vt->x, $vt->y);
+
     for (1 .. $vt->rows) {
-	local $^W; # abandon all hope, ye who enter here
+	local $SIG{__WARN__} = sub {}; # abandon all hope, ye who enter here
 
 	my $row = $vt->row_text($_);
 	my $att = $vt->row_attr($_);
+	my $yok = ($_ == $y);
 
 	for (0 .. length($row)) {
 	    my $text = substr($row, $_, 1);
-	    next unless $Options{fill_cols} or $text ne "\000";
 
 	    @this{qw|fg bg bo fo st ul bl rv|} = $vt->attr_unpack(
 		substr($att, $_ * 2, 2)
 	    );
+
+	    if ($yok and $x == $_ + 1) {
+		@this{qw|fg bg bo bl|} = (@this{qw|bg fg bl bo|});
+		$text = ' ' if $text eq '\000';
+	    }
+	    elsif ($text eq "\000") {
+		next unless $Options{fill_cols};
+	    }
 
 	    $out .= diff_attr(\%prev, \%this) . (
 		($text eq ' ' or $text eq "\000") ? '&nbsp;' :
@@ -235,7 +265,7 @@ Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2001, 2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+Copyright 2001, 2002, 2003 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
 
 This program is free software; you can redistribute it and/or 
 modify it under the same terms as Perl itself.

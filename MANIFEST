@@ -1,7 +1,11 @@
 Changes
-MANIFEST
+lib/HTML/FromANSI.pm
 Makefile.PL
-FromANSI.pm
+MANIFEST			This list of files
+META.yml
 README
+script/ansi2html
+SIGNATURE
+t/0-signature.t
 t/1-basic.t
-bin/ansi2html
+t/a
