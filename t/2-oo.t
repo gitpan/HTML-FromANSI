@@ -3,9 +3,13 @@
 use strict;
 use Test::More tests => 2;
 
-use ok 'HTML::FromANSI', show_cursor => 1;
+use ok 'HTML::FromANSI';
 
-my $text = ansi2html("\x1b[1;34m", "This text is bold blue.");
+my $h = HTML::FromANSI->new(
+    show_cursor => 1,
+);
+
+my $text = $h->ansi_to_html("\x1b[1;34m", "This text is bold blue.");
 
 is($text, join('', split("\n", << '.')), 'basic conversion');
 <tt><font
@@ -16,3 +20,4 @@ This&nbsp;text&nbsp;is&nbsp;bold&nbsp;blue.</span>
 <span style='color: black; background: black; '><br></span>
 </font></tt>
 .
+

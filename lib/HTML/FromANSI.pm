@@ -1,14 +1,13 @@
-# $File: //member/autrijus/HTML-FromANSI/lib/HTML/FromANSI.pm $ $Author: autrijus $
-# $Revision: #3 $ $Change: 7867 $ $DateTime: 2003/09/04 17:11:36 $
-
 package HTML::FromANSI;
-$HTML::FromANSI::VERSION = '1.01';
+$HTML::FromANSI::VERSION = '2.00';
 
 use strict;
 use base qw/Exporter/;
 use vars qw/@EXPORT @EXPORT_OK @Color %Options/;
-use Term::VT102;
+use Term::VT102::Boundless;
 use HTML::Entities;
+use Scalar::Util qw(blessed reftype);
+use Carp qw(croak);
 
 =head1 NAME
 
@@ -21,8 +20,28 @@ September 5, 2003.
 
 =head1 SYNOPSIS
 
-    use HTML::FromANSI;
+    use HTML::FromANSI (); # avoid exports if using OO
     use Term::ANSIColor;
+
+    my $h = HTML::FromANSI->new(
+        fill_cols => 1,
+    );
+
+
+    $h->add_text(color('bold blue'), "This text is bold blue.");
+
+    print $h->html;
+
+
+    # you can append text in the new api:
+
+    $h->add_text(color('bold blue'), " still blue.");
+
+    print $h->html
+
+
+
+    # The old API still works:
 
     $HTML::FromANSI::Options{fill_cols} = 1; # fill all 80 cols
     print ansi2html(color('bold blue'), "This text is bold blue.");
@@ -127,7 +146,7 @@ Defaults to C<0>.
 %Options = (
     linewrap	=> 1,		# wrap long lines
     lf_to_crlf	=> (		# translate \n to \r\n on Unix
-	$^O !~ /^(?:MSWin32|MacOS)$/
+        $^O !~ /^(?:MSWin32|MacOS)$/
     ),
     fill_cols	=> 0,		# fill all (80) columns with space
     html_entity => 0,		# escape all HTML entities
@@ -137,107 +156,156 @@ Defaults to C<0>.
     style	=> 'line-height: 1; letter-spacing: 0; font-size: 12pt',
     tt		=> 1,
     show_cursor	=> 0,
+
+    terminal_class => 'Term::VT102::Boundless',
 );
 
 sub import {
     my $class = shift;
     while (my ($k, $v) = splice(@_, 0, 2)) {
-	$Options{$k} = $v;
+        $Options{$k} = $v;
     }
     $class->export_to_level(1);
 }
 
+sub new {
+    my ( $class, @args ) = @_;
+
+    if ( @args == 1 && reftype($args[0]) eq 'HASH' ) {
+        return bless { %Options, %{ $args[0] } }, $class;
+    } elsif ( @args % 2 == 0 ) {
+        return bless { %Options, @args }, $class;
+    } else {
+        croak "Constructor arguments must be an even sized list or a hash ref";
+    }
+}
+
+sub _obj_args {
+    if ( blessed($_[0]) and $_[0]->isa(__PACKAGE__) ) {
+        return @_;
+    } else {
+        return ( __PACKAGE__->new(), @_ );
+    }
+}
+
 sub ansi2html {
-    my $vt = Term::VT102->new(
-	cols	=> $Options{cols} || 80,
-	rows	=> $Options{rows} || count_lines(@_),
-    );
+    my ( $self, @args ) = _obj_args(@_);
+    $self->ansi_to_html(@args);
+}
 
-    $vt->option_set(LINEWRAP => $Options{linewrap});
-    $vt->option_set(LFTOCRLF => $Options{lf_to_crlf});
-    $vt->process($_) for @_;
+sub terminal_object {
+    my ( $self, @args ) = @_;
+    $self->{terminal_object} ||= $self->create_terminal_object(@args);
+}
 
-    my $result = parse_vt($vt);
+sub create_terminal_object {
+    my ( $self, %args ) = @_;
 
-    if (length $Options{font_face} or length $Options{style}) {
-	$result = "<font face='$Options{font_face}' style='$Options{style}'>".
-	          $result."</font>";
+    my $class = $self->{terminal_class};
+
+    if ( $class ne 'Term::VT102::Boundless' ) {
+        ( my $file = "${class}.pm" ) =~ s{::}{/}g;
+        require $file;
     }
 
-    $result = "<tt>$result</tt>" if $Options{tt};
+    my $vt = Term::VT102::Boundless->new(
+        cols => $self->{cols},
+    );
+
+    $vt->option_set(LINEWRAP => $self->{linewrap});
+    $vt->option_set(LFTOCRLF => $self->{lf_to_crlf});
+
+    return $vt;
+}
+
+sub add_text {
+    my ( $self, @lines ) = @_;
+    $self->terminal_object->process($_) for @lines;
+}
+
+sub ansi_to_html {
+    my ( $self, @lines ) = @_;
+
+    $self->add_text(@lines);
+
+    return $self->html;
+}
+
+sub html {
+    my ( $self, @args ) = @_;
+
+    my $result = $self->parse_vt($self->terminal_object);
+
+    if (length $self->{font_face} or length $self->{style}) {
+        $result = "<font face='$self->{font_face}' style='$self->{style}'>".
+        $result."</font>";
+    }
+
+    $result = "<tt>$result</tt>" if $self->{tt};
 
     return $result;
 }
 
-sub count_lines {
-    my $lines = 0;
-
-    for (map { split(/\n/) } join('', @_)) {
-	s/\x1b\[[^a-zA-Z]*[a-zA-Z]//g;
-	$lines += int(length($_) / 80) + 1;
-    }
-
-    return $lines;
-}
-
 sub parse_vt {
-    my $vt = shift;
+    my ( $self, $vt ) = _obj_args(@_);
+
     my (%prev, %this); # attributes
     my $out;
 
     my ($x, $y) = ($vt->x, $vt->y);
 
     for (1 .. $vt->rows) {
-	local $SIG{__WARN__} = sub {}; # abandon all hope, ye who enter here
+        local $SIG{__WARN__} = sub {}; # abandon all hope, ye who enter here
 
-	my $row = $vt->row_text($_);
-	my $att = $vt->row_attr($_);
-	my $yok = ($_ == $y);
+        my $row = $vt->row_text($_);
+        my $att = $vt->row_attr($_);
+        my $yok = ($_ == $y);
 
-	for (0 .. length($row)) {
-	    my $text = substr($row, $_, 1);
+        for (0 .. length($row)) {
+            my $text = substr($row, $_, 1);
 
-	    @this{qw|fg bg bo fo st ul bl rv|} = $vt->attr_unpack(
-		substr($att, $_ * 2, 2)
-	    );
+            @this{qw|fg bg bo fo st ul bl rv|} = $vt->attr_unpack(
+                substr($att, $_ * 2, 2)
+            );
 
-	    if ($yok and $x == $_ + 1) {
-		@this{qw|fg bg bo bl|} = (@this{qw|bg fg bl bo|});
-		$text = ' ' if $text eq '\000';
-	    }
-	    elsif ($text eq "\000") {
-		next unless $Options{fill_cols};
-	    }
+            if ($yok and $x == $_ + 1) {
+                @this{qw|fg bg bo bl|} = (@this{qw|bg fg bl bo|});
+                $text = ' ' if $text eq '\000';
+            }
+            elsif ($text eq "\000") {
+                next unless $self->{fill_cols};
+            }
 
-	    $out .= diff_attr(\%prev, \%this) . (
-		($text eq ' ' or $text eq "\000") ? '&nbsp;' :
-		$Options{html_entity} ? encode_entities($text)
-		: encode_entities($text, '<>"&')
-	    );
+            $out .= $self->diff_attr(\%prev, \%this) . (
+                ($text eq ' ' or $text eq "\000") ? '&nbsp;' :
+                $self->{html_entity} ? encode_entities($text)
+                : encode_entities($text, '<>"&')
+            );
 
-	    %prev = %this;
-	}
+            %prev = %this;
+        }
 
-	$out .= "<br>";
-    } 
+        $out .= "<br>";
+    }
 
     return "$out</span>";
 }
 
 sub diff_attr {
-    my ($prev, $this) = @_;
+    my ($self, $prev, $this) = _obj_args(@_);
     my $out = '';
 
     # skip if the attributes remain unchanged
     return if %{$prev} and not scalar (grep {
-	($_->[0] ne $_->[1])
-    } map {
-	[ $prev->{$_}, $this->{$_} ]
-    } keys %{$this});
+            ($_->[0] ne $_->[1])
+        } map {
+            [ $prev->{$_}, $this->{$_} ]
+        } keys %{$this}
+    );
 
-    # bold, faint, standout, underline, blink and reverse 
+    # bold, faint, standout, underline, blink and reverse
     my ($fg, $bg, $bo, $fo, $st, $ul, $bl, $rv)
-	= @{$this}{qw|fg bg bo fo st ul bl rv|};
+        = @{$this}{qw|fg bg bo fo st ul bl rv|};
 
     ($fg, $bg) = ($bg, $fg) if $rv;
 
@@ -257,19 +325,20 @@ __END__
 
 =head1 SEE ALSO
 
-L<Term::VT102>, L<HTML::Entities>, L<Term::ANSIScreen>
+L<Term::VT102::Boundless>, L<HTML::Entities>, L<Term::ANSIScreen>
 
 =head1 AUTHORS
 
-Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+Audrey Tang E<lt>audreyt@audreyt.orgE<gt>
+Yuval Kogman E<lt>nothingmuch@woobling.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2001, 2002, 2003 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+Copyright 2001, 2002, 2003 by Audrey Tang E<lt>audreyt@audreyt.orgE<gt>.
 
-This program is free software; you can redistribute it and/or 
-modify it under the same terms as Perl itself.
+Copyright 2007 Yuval Kogman E<lt>nothingmuch@Woobling.orgE<gt>
 
-See L<http://www.perl.com/perl/misc/Artistic.html>
+This program is free software; you can redistribute it and/or
+modify it under the terms of the MIT license or the same terms as Perl itself.
 
 =cut
