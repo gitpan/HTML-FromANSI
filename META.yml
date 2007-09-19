@@ -1,13 +1,13 @@
 --- #YAML:1.0
 name:                HTML-FromANSI
-version:             2.00
+version:             2.01
 abstract:            ~
 license:             ~
 generated_by:        ExtUtils::MakeMaker version 6.32
 distribution_type:   module
 requires:     
     HTML::Entities:                0.01
-    Term::VT102::Boundless:        0.02
+    Term::VT102::Boundless:        0.03
     Test::More:                    0.11
     Test::use::ok:                 0
 meta-spec:
