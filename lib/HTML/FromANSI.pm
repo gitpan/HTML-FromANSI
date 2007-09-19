@@ -1,5 +1,5 @@
 package HTML::FromANSI;
-$HTML::FromANSI::VERSION = '2.01';
+$HTML::FromANSI::VERSION = '2.02';
 
 use strict;
 use base qw/Exporter/;
@@ -315,9 +315,9 @@ sub diff_attr {
 
     $out .= "</span>" if %{$prev};
     $out .= "<span style='";
-    $out .= "color: $Color[$this->{fg} + $this->{bo} * 8]; ";
-    $out .= "background: $Color[$this->{bg} + $this->{bl} * 8]; ";
-    $out .= "text-decoration: underline; " if $this->{ul};
+    $out .= "color: $Color[$fg + $bo * 8]; ";
+    $out .= "background: $Color[$bg + $bl * 8]; ";
+    $out .= "text-decoration: underline; " if $ul;
     $out .= "'>";
 
     return $out;
